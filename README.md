@@ -1,2 +1,1 @@
-# kobezza_intensives
-Homeworks for Kobezza Intensives
+# Homeworks for Kobezza Intensives
