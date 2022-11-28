@@ -1,26 +1,26 @@
 // 1. Необходимо добавить все строкам в JavaScript метод capitalize, который делает первую букву в строке заглавной
 
-function addCapitalize() {
+export const addCapitalize = function () {
   if (!String.prototype.capitalize) {
     String.prototype.capitalize = function () {
       return this[0].toUpperCase() + this.slice(1);
     };
   }
-}
+};
 
 // 2. Необходимо добавить все массивам в JavaScript метод filterMap, который принимает 2 функции: фильтр и map
 
-function addFilterMap() {
+export const addFilterMap = function () {
   if (!Array.prototype.filterMap) {
     Array.prototype.filterMap = function filterMap(filterCb, mapCb) {
       return this.filter(filterCb).map(mapCb);
     };
   }
-}
+};
 
 // 3. Необходимо сделать конкретному массиву метод toString, который возвращает первый элемент .. последний.
 
-function addToString<T>(arr: T[]): T[] {
+export const addToString = function <T>(arr: T[]): T[] {
   const defToString = arr.toString;
 
   arr.toString = function () {
@@ -35,7 +35,7 @@ function addToString<T>(arr: T[]): T[] {
 // 4. Необходимо создать функцию-конструктор, которая создает пользователя с заданным именем (имя и фамилия) и возрастом.
 // А также, необходимо определить функции, sayName (возвращает полное имя) и has18 (true, если есть 18)
 
-function User(this: any, name: string, surname: string, age: number) {
+export function User(this: any, name: string, surname: string, age: number) {
   this.name = name;
   this.surname = surname;
   this.age = age;
@@ -52,9 +52,9 @@ User.prototype.sayName = function () {
 // 5. Необходимо создать функцию-конструктор, которая создает пользователя с заданным именем (имя и фамилия) и возрастом.
 // А также, необходимо определить функции, sayName (возвращает полное имя) и has18 (true, если есть 18)
 
-type U = { fname: string; lname: string; age: number };
+export type U = { fname: string; lname: string; age: number };
 
-function User2(this: any, user: U) {
+export function User2(this: any, user: U) {
   this.user = user;
 }
 
