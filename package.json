@@ -1,0 +1,19 @@
+{
+  "name": "kobezza_intensives",
+  "version": "1.0.0",
+  "description": "Homeworks for Kobezza Intensives",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikashyntseva/kobezza_intensives.git"
+  },
+  "author": "Irina Kashyntseva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ikashyntseva/kobezza_intensives/issues"
+  },
+  "homepage": "https://github.com/ikashyntseva/kobezza_intensives#readme"
+}
