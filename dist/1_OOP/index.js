@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.objectCreate = exports.User2 = exports.User = exports.addToString = exports.addFilterMap = exports.addCapitalize = void 0;
+exports.objectCreate2 = exports.objectCreate = exports.User2 = exports.User = exports.addToString = exports.addFilterMap = exports.addCapitalize = void 0;
 const addCapitalize = function () {
     if (!String.prototype.capitalize) {
         String.prototype.capitalize = function () {
@@ -54,3 +54,7 @@ const objectCreate = (proto, propertiesObject) => ({
     ...propertiesObject,
 });
 exports.objectCreate = objectCreate;
+const objectCreate2 = (proto, propertiesObject) => Object.setPrototypeOf({
+    ...propertiesObject,
+}, proto);
+exports.objectCreate2 = objectCreate2;

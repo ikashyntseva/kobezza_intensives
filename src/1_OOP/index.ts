@@ -30,7 +30,7 @@ export const addToString = function <T>(arr: T[]): T[] {
   };
 
   return arr;
-}
+};
 
 // 4. Необходимо создать функцию-конструктор, которая создает пользователя с заданным именем (имя и фамилия) и возрастом.
 // А также, необходимо определить функции, sayName (возвращает полное имя) и has18 (true, если есть 18)
@@ -75,3 +75,16 @@ export const objectCreate = (
   __proto__: proto,
   ...propertiesObject,
 });
+
+// 7. Необходимо написать аналог Object.create с использованием Object.setPrototypeOf
+
+export const objectCreate2 = (
+  proto: object | null,
+  propertiesObject?: object
+) =>
+  Object.setPrototypeOf(
+    {
+      ...propertiesObject,
+    },
+    proto
+  );
