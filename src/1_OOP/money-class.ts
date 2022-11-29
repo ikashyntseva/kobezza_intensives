@@ -6,49 +6,39 @@
 // Задание нужно сделать 2-мя способами: с помощью ES6 class и с помощью функций.
 
 class Money {
-  amount = 0;
+  value;
+  rate?;
 
-  constructor(amount: number) {
-    this.amount = amount;
+  constructor(value: number | Money, rate?: number) {
+    this.value = value;
+    this.rate = rate;
   }
 
   get() {
-    return this.amount;
-  }
-}
+    if (this.value instanceof Money) {
+      const money = this.value as Money;
+      const amount = money.value as number;
 
-class Zloty extends Money {
-  constructor(amount: number) {
-    super(amount);
-  }
-}
-
-class Dollar extends Money {
-  money?: Money;
-  rate?: number;
-
-  constructor(amount: number);
-  constructor(money: Money, rate: number);
-  constructor(money: Money | number , rate?: number) {
-    if (money instanceof Money) {
-      super(money.amount);
-      this.money = money;
-      this.rate = rate;
-      this.amount = Math.floor(this.amount * 10 / this.rate!) / 10
-    } else {
-      super(money);
+      return amount * this.rate!;
     }
+
+    return this.value;
   }
+
   setMod(rate: number) {
     this.rate = rate;
-    this.amount = Math.floor(this.money!.amount! * 10 / this.rate) / 10;
 
     return this;
   }
 }
 
-const pln = new Zloty(100);
-const dol = new Dollar(pln, 75);
+class Zloty extends Money {}
 
-console.log(dol);
-console.log(dol.setMod(90).get());
+class Dollar extends Money {}
+
+// const pln = new Zloty(100);
+// const dol = new Dollar(pln, 0.25);
+
+// console.log(pln.get());
+// console.log(dol.get());
+// console.log(dol.setMod(0.5).get());

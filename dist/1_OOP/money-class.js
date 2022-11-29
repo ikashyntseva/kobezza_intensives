@@ -1,39 +1,25 @@
 "use strict";
 class Money {
-    amount = 0;
-    constructor(amount) {
-        this.amount = amount;
+    value;
+    rate;
+    constructor(value, rate) {
+        this.value = value;
+        this.rate = rate;
     }
     get() {
-        return this.amount;
-    }
-}
-class Zloty extends Money {
-    constructor(amount) {
-        super(amount);
-    }
-}
-class Dollar extends Money {
-    money;
-    rate;
-    constructor(money, rate) {
-        if (money instanceof Money) {
-            super(money.amount);
-            this.money = money;
-            this.rate = rate;
-            this.amount = Math.floor(this.amount * 10 / this.rate) / 10;
+        if (this.value instanceof Money) {
+            const money = this.value;
+            const amount = money.value;
+            return amount * this.rate;
         }
-        else {
-            super(money);
-        }
+        return this.value;
     }
     setMod(rate) {
         this.rate = rate;
-        this.amount = Math.floor(this.money.amount * 10 / this.rate) / 10;
         return this;
     }
 }
-const pln = new Zloty(100);
-const dol = new Dollar(pln, 75);
-console.log(dol);
-console.log(dol.setMod(90).get());
+class Zloty extends Money {
+}
+class Dollar extends Money {
+}

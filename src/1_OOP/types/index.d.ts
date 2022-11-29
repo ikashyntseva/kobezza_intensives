@@ -6,25 +6,16 @@ declare global {
   }
 
   interface Array<T> {
-    filterMap(filterCb: (el: T) => boolean, mapCb: (el: T) => T): T[];
+    filterMap(
+      filterCb: (el: T, i: number, this: T[]) => boolean,
+      mapCb: (el: T, i: number, this: T[]) => T
+    ): T[];
   }
 }
 
 declare class Money {
-  amount: number;
+  value: number | Money;
+  rate?: number;
   get(): number;
-}
-
-declare class Dollar {
-  amount: number;
-  money?: Money;
-  rate?: number;
-  constructor(amount: number);
-  constructor(str: Money, rate: number);
-}
-
-declare interface IDollar {
-  amount: number;
-  money?: Money;
-  rate?: number;
+  setMod(rate: number): Money;
 }

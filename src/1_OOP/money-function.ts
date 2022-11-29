@@ -1,53 +1,46 @@
 interface IMoney {
-  amount: number;
-  get: () => number;
-}
-
-interface IDollar {
-  money?: IMoney;
+  value: number | IMoney;
   rate?: number;
-  setMod: (rate: number) => IDollar;
 }
 
-function MoneyF(this: any, amount: number) {
-  this.amount = amount;
+function MoneyF(this: any, value: number | IMoney, rate?: number) {
+  this.value = value;
+  this.rate = rate;
 }
 
 MoneyF.prototype.get = function () {
-  return this.amount;
+  if (this.value instanceof MoneyF) {
+    const money = this.value as IMoney;
+    const amount = money.value as number;
+
+    return amount * this.rate;
+  }
+
+  return this.value;
 };
 
-function ZlotyF(this: any, amount: number) {
-  MoneyF.call(this, amount);
-}
-
-function DollarF(this: any, amount: number): IDollar;
-function DollarF(this: any, money: IMoney, rate: number): IDollar;
-function DollarF(this: any, money: any, rate?: any): any {
-  if (money instanceof MoneyF) {
-    const { amount } = money as IMoney;
-
-    MoneyF.call(this, amount);
-
-    this.money = money;
-    this.setMod(rate);
-  } else {
-    this.amount = money;
-  }
-}
-
-DollarF.prototype = MoneyF.prototype;
-DollarF.prototype.setMod = function (rate: number) {
+MoneyF.prototype.setMod = function (rate: number): IMoney {
   this.rate = rate;
-  this.amount = Math.floor((this.money!.amount! * 10) / this.rate) / 10;
 
   return this;
 };
 
+function ZlotyF(this: any, value: number | IMoney, rate?: number) {
+  MoneyF.call(this, value, rate);
+}
+
+function DollarF(this: any, value: number | IMoney, rate?: number) {
+  MoneyF.call(this, value, rate);
+}
+
+ZlotyF.prototype = MoneyF.prototype;
+DollarF.prototype = MoneyF.prototype;
+
 // @ts-ignore
-const zl = new MoneyF(100);
-console.log(zl);
+const pln = new ZlotyF(100);
 // @ts-ignore
-const dollar = new DollarF(zl, 75);
-console.log(dollar);
-console.log(dollar.setMod(80).get());
+const dol = new DollarF(pln, 0.25);
+
+console.log(pln.get());
+console.log(dol.get());
+console.log(dol.setMod(0.5).get());

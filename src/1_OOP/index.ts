@@ -3,7 +3,7 @@
 export const addCapitalize = function () {
   if (!String.prototype.capitalize) {
     String.prototype.capitalize = function () {
-      return this[0].toUpperCase() + this.slice(1);
+      return this[0]?.toUpperCase() + this.slice(1);
     };
   }
 };
@@ -13,7 +13,15 @@ export const addCapitalize = function () {
 export const addFilterMap = function () {
   if (!Array.prototype.filterMap) {
     Array.prototype.filterMap = function filterMap(filterCb, mapCb) {
-      return this.filter(filterCb).map(mapCb);
+      const res = [];
+
+      for (const [i, el] of this.entries()) {
+        if (filterCb(el, i, this)) {
+          res.push(mapCb(el, i, this));
+        }
+      }
+
+      return res;
     };
   }
 };
@@ -26,7 +34,7 @@ export const addToString = function <T>(arr: T[]): T[] {
   arr.toString = function () {
     return this.length <= 1
       ? defToString.call(this)
-      : `${this[0]}..${[...this].pop()}`;
+      : `${this[0]}..${this.at(-1)}`;
   };
 
   return arr;
@@ -36,6 +44,10 @@ export const addToString = function <T>(arr: T[]): T[] {
 // А также, необходимо определить функции, sayName (возвращает полное имя) и has18 (true, если есть 18)
 
 export function User(this: any, name: string, surname: string, age: number) {
+  if (new.target !== User) {
+    throw new Error("You should use this function with new");
+  }
+
   this.name = name;
   this.surname = surname;
   this.age = age;
@@ -88,3 +100,13 @@ export const objectCreate2 = (
     },
     proto
   );
+
+// 8. Необходимо написать аналог Object.create с использованием new function
+
+export const objectCreate3 = function (proto: object | null) {
+  function tmp() {}
+
+  tmp.prototype = proto;
+  // @ts-ignore
+  return new tmp();
+};

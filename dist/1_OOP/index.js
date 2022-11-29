@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.objectCreate2 = exports.objectCreate = exports.User2 = exports.User = exports.addToString = exports.addFilterMap = exports.addCapitalize = void 0;
+exports.objectCreate3 = exports.objectCreate2 = exports.objectCreate = exports.User2 = exports.User = exports.addToString = exports.addFilterMap = exports.addCapitalize = void 0;
 const addCapitalize = function () {
     if (!String.prototype.capitalize) {
         String.prototype.capitalize = function () {
-            return this[0].toUpperCase() + this.slice(1);
+            return this[0]?.toUpperCase() + this.slice(1);
         };
     }
 };
@@ -12,7 +12,13 @@ exports.addCapitalize = addCapitalize;
 const addFilterMap = function () {
     if (!Array.prototype.filterMap) {
         Array.prototype.filterMap = function filterMap(filterCb, mapCb) {
-            return this.filter(filterCb).map(mapCb);
+            const res = [];
+            for (const [i, el] of this.entries()) {
+                if (filterCb(el, i, this)) {
+                    res.push(mapCb(el, i, this));
+                }
+            }
+            return res;
         };
     }
 };
@@ -22,12 +28,15 @@ const addToString = function (arr) {
     arr.toString = function () {
         return this.length <= 1
             ? defToString.call(this)
-            : `${this[0]}..${[...this].pop()}`;
+            : `${this[0]}..${this.at(-1)}`;
     };
     return arr;
 };
 exports.addToString = addToString;
 function User(name, surname, age) {
+    if (new.target !== User) {
+        throw new Error("You should use this function with new");
+    }
     this.name = name;
     this.surname = surname;
     this.age = age;
@@ -58,3 +67,9 @@ const objectCreate2 = (proto, propertiesObject) => Object.setPrototypeOf({
     ...propertiesObject,
 }, proto);
 exports.objectCreate2 = objectCreate2;
+const objectCreate3 = function (proto) {
+    function tmp() { }
+    tmp.prototype = proto;
+    return new tmp();
+};
+exports.objectCreate3 = objectCreate3;
