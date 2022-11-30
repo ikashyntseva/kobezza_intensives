@@ -3,7 +3,10 @@
 // Движки следует хранить как статические свойства класса. Методы класса должны возвращать Promise.
 // Следует реализовать 2 движка: localStorage и IndexedDB.
 
-class LocalStorage {
+type DB = { dbName: string; dbStoreName: string };
+
+type PrivateStorage = { [key: string]: any }[];
+export class LocalStorage {
   constructor() {}
 
   set(key: string, value: any) {
@@ -18,15 +21,14 @@ class LocalStorage {
   }
 }
 
-type DB = { dbName: string; dbStoreName: string };
-
-class IndexedDB {
-  // @ts-ignore
-  #value?;
+export class IndexedDB {
   storeName;
   db: any;
 
-  constructor({ dbName, dbStoreName }: DB) {
+  constructor({
+    dbName,
+    dbStoreName,
+  }: DB) {
     this.storeName = dbStoreName;
 
     const openRequest = window.indexedDB.open(dbName);
@@ -94,7 +96,37 @@ class KVStorage {
   }
 }
 
+class KVStorageB extends KVStorage {
+  static #engine: LocalStorage | IndexedDB;
+  static #st: PrivateStorage = [];
+
+  static storage(engine: LocalStorage | IndexedDB) {
+    KVStorageB.#engine = engine;
+    return this;
+  }
+  static set(key: string, value: any) {
+    KVStorageB.#st.push({ key, value });
+    return this;
+  }
+  static create() {
+    // @ts-ignore
+    const storage = new this.prototype.constructor();
+
+    for (let { key, value } of KVStorageB.#st) {
+      storage.set(key, value);
+    }
+
+    return storage;
+  }
+
+  constructor() {
+    super(KVStorageB.#engine);
+  }
+}
+
 KVStorage.indexedDB = new IndexedDB({
   dbName: "Test_Data_Base2",
   dbStoreName: "store1",
 });
+
+KVStorageB.localStorage = new LocalStorage();

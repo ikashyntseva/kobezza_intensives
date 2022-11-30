@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IndexedDB = exports.LocalStorage = void 0;
 class LocalStorage {
     constructor() { }
     set(key, value) {
@@ -12,11 +14,11 @@ class LocalStorage {
         return localStorage.removeItem(key);
     }
 }
+exports.LocalStorage = LocalStorage;
 class IndexedDB {
-    #value;
     storeName;
     db;
-    constructor({ dbName, dbStoreName }) {
+    constructor({ dbName, dbStoreName, }) {
         this.storeName = dbStoreName;
         const openRequest = window.indexedDB.open(dbName);
         openRequest.onsuccess = () => {
@@ -49,6 +51,7 @@ class IndexedDB {
         store.clear();
     }
 }
+exports.IndexedDB = IndexedDB;
 class KVStorage {
     static localStorage = new LocalStorage();
     static indexedDB;
@@ -66,7 +69,30 @@ class KVStorage {
         return this.#engine.remove(key);
     }
 }
+class KVStorageB extends KVStorage {
+    static #engine;
+    static #st = [];
+    static storage(engine) {
+        KVStorageB.#engine = engine;
+        return this;
+    }
+    static set(key, value) {
+        KVStorageB.#st.push({ key, value });
+        return this;
+    }
+    static create() {
+        const storage = new this.prototype.constructor();
+        for (let { key, value } of KVStorageB.#st) {
+            storage.set(key, value);
+        }
+        return storage;
+    }
+    constructor() {
+        super(KVStorageB.#engine);
+    }
+}
 KVStorage.indexedDB = new IndexedDB({
     dbName: "Test_Data_Base2",
     dbStoreName: "store1",
 });
+KVStorageB.localStorage = new LocalStorage();
