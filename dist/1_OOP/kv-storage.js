@@ -18,7 +18,7 @@ exports.LocalStorage = LocalStorage;
 class IndexedDB {
     storeName;
     db;
-    constructor({ dbName, dbStoreName, }) {
+    constructor({ dbName, dbStoreName }) {
         this.storeName = dbStoreName;
         const openRequest = window.indexedDB.open(dbName);
         openRequest.onsuccess = () => {
@@ -71,24 +71,25 @@ class KVStorage {
 }
 class KVStorageB extends KVStorage {
     static #engine;
-    static #st = [];
+    static #privateBuffer = [];
     static storage(engine) {
         KVStorageB.#engine = engine;
-        return this;
+        return {
+            set(key, value) {
+                KVStorageB.#privateBuffer.push({ key, value });
+                return this;
+            },
+            create() {
+                const storage = new KVStorage(KVStorageB.#engine);
+                KVStorageB.#privateBuffer.forEach(({ key, value }) => {
+                    storage.set(key, value);
+                });
+                return storage;
+            },
+        };
     }
-    static set(key, value) {
-        KVStorageB.#st.push({ key, value });
-        return this;
-    }
-    static create() {
-        const storage = new this.prototype.constructor();
-        for (let { key, value } of KVStorageB.#st) {
-            storage.set(key, value);
-        }
-        return storage;
-    }
-    constructor() {
-        super(KVStorageB.#engine);
+    constructor(engine) {
+        super(engine);
     }
 }
 KVStorage.indexedDB = new IndexedDB({
@@ -96,3 +97,7 @@ KVStorage.indexedDB = new IndexedDB({
     dbStoreName: "store1",
 });
 KVStorageB.localStorage = new LocalStorage();
+KVStorageB.storage(KVStorageB.localStorage)
+    .set("foo", { bla: 1 })
+    .set("bar", { bla: 2 })
+    .create();

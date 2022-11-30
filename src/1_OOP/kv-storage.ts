@@ -5,7 +5,7 @@
 
 type DB = { dbName: string; dbStoreName: string };
 
-type PrivateStorage = { [key: string]: any }[];
+type PrivateBuffer = { [key: string]: any }[];
 export class LocalStorage {
   constructor() {}
 
@@ -25,10 +25,7 @@ export class IndexedDB {
   storeName;
   db: any;
 
-  constructor({
-    dbName,
-    dbStoreName,
-  }: DB) {
+  constructor({ dbName, dbStoreName }: DB) {
     this.storeName = dbStoreName;
 
     const openRequest = window.indexedDB.open(dbName);
@@ -96,31 +93,35 @@ class KVStorage {
   }
 }
 
+// С помощью специальных статических методов наполняем внутренний буффер,
+// а затем сразу все инициализируем (вызов create)
+
 class KVStorageB extends KVStorage {
   static #engine: LocalStorage | IndexedDB;
-  static #st: PrivateStorage = [];
+  static #privateBuffer: PrivateBuffer = [];
 
   static storage(engine: LocalStorage | IndexedDB) {
     KVStorageB.#engine = engine;
-    return this;
-  }
-  static set(key: string, value: any) {
-    KVStorageB.#st.push({ key, value });
-    return this;
-  }
-  static create() {
-    // @ts-ignore
-    const storage = new this.prototype.constructor();
 
-    for (let { key, value } of KVStorageB.#st) {
-      storage.set(key, value);
-    }
+    return {
+      set(key: string, value: any) {
+        KVStorageB.#privateBuffer.push({ key, value });
+        return this;
+      },
+      create(): any {
+        const storage = new KVStorage(KVStorageB.#engine);
 
-    return storage;
+        KVStorageB.#privateBuffer.forEach(({ key, value }) => {
+          storage.set(key, value);
+        });
+
+        return storage;
+      },
+    };
   }
 
-  constructor() {
-    super(KVStorageB.#engine);
+  constructor(engine: LocalStorage | IndexedDB) {
+    super(engine);
   }
 }
 
@@ -130,3 +131,8 @@ KVStorage.indexedDB = new IndexedDB({
 });
 
 KVStorageB.localStorage = new LocalStorage();
+
+KVStorageB.storage(KVStorageB.localStorage)
+  .set("foo", { bla: 1 })
+  .set("bar", { bla: 2 })
+  .create();
